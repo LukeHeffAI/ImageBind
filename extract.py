@@ -25,15 +25,15 @@ with torch.no_grad():
     embeddings = model(inputs)
 
 print(
-    "Vision x Text: ",
+    "Vision x Text:\n",
     torch.softmax(embeddings[ModalityType.VISION] @ embeddings[ModalityType.TEXT].T, dim=-1),
 )
 print(
-    "Audio x Text: ",
+    "Audio x Text:\n",
     torch.softmax(embeddings[ModalityType.AUDIO] @ embeddings[ModalityType.TEXT].T, dim=-1),
 )
 print(
-    "Vision x Audio: ",
+    "Vision x Audio:\n",
     torch.softmax(embeddings[ModalityType.VISION] @ embeddings[ModalityType.AUDIO].T, dim=-1),
 )
 
