@@ -73,4 +73,4 @@ dataset = text_list_esc10
 num_synonyms = 10
 mode = "sounds"
 
-print(synonym_dataset_generator("crackling_fire", num_synonyms, mode))
+print(synonym_dataset_generator(dataset, num_synonyms, mode))
