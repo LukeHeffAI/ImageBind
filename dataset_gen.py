@@ -2,7 +2,6 @@ import os
 import openai
 from dotenv import load_dotenv
 from loguru import logger
-from prompts import text_list_esc10, text_list_esc50, text_list_categories, prompt
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -69,8 +68,28 @@ def synonym_dataset_generator(dataset, num_synonyms, mode):
     
     return dataset_descriptions
 
-dataset = text_list_esc10
-num_synonyms = 10
-mode = "sounds"
+def synonym_dataset_dict_to_str(synonym_dataset_dict:dict, label_type_list:list):
+    '''
+    This function takes a dictionary where each key is a label and value is a list of strings (each being synonyms for that label).
+    The function converts this dictionary into a single list of strings.
 
-print(synonym_dataset_generator(dataset, num_synonyms, mode))
+    Note: synonyms that have been generated from the labels using the function synonym_dataset_generator() will fit this format.
+
+    Inputs:
+        synonym_dataset_dict: A dictionary where each key is a label and value is a list of strings (each being synonyms for that label).
+        label_type_list: A list of labels
+    Outputs:
+        synonyms: A single list of strings (each being synonyms for a label)
+    '''
+
+    synonyms_str = []
+    synonyms = []
+
+    for i in range(len(synonym_dataset_dict)):
+        synonyms_str.append(synonym_dataset_dict[label_type_list[i]])
+        
+    for i in range(len(synonyms_str)):
+        for j in synonyms_str[i]:
+            synonyms.append(j)
+
+    return synonyms
