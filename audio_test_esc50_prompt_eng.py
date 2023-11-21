@@ -6,16 +6,72 @@ import glob
 import csv
 
 # Define list of classes contained in audio dataset
-text_list_esc50 = ['mouse_click', 'fireworks', 'helicopter', 'dog', 'church_bells', 'toilet_flush', 'glass_breaking', 'category', 'sea_waves', 'wind', 'laughing', 'washing_machine', 'crickets', 'breathing', 'clapping', 'car_horn', 'keyboard_typing', 'hand_saw', 'cat', 'cow', 'frog', 'rooster', 'insects', 'sheep', 'coughing', 'door_wood_creaks', 'crying_baby', 'pouring_water', 'sneezing', 'door_wood_knock', 'thunderstorm', 'rain', 'vacuum_cleaner', 'clock_tick', 'water_drops', 'can_opening', 'brushing_teeth', 'crackling_fire', 'engine', 'snoring', 'siren', 'chirping_birds', 'drinking_sipping', 'airplane', 'hen', 'crow', 'pig', 'footsteps', 'clock_alarm', 'train', 'chainsaw']
-text_list_categories = ['animals', 'natural soundscapes/water', 'human/non-speech', 'interior/domestic', 'exterior/urban']
+text_list_esc50 = [
+    'mouse_click',
+    'fireworks',
+    'helicopter',
+    'dog',
+    'church_bells',
+    'toilet_flush',
+    'glass_breaking',
+    'category',
+    'sea_waves',
+    'wind',
+    'laughing',
+    'washing_machine',
+    'crickets',
+    'breathing',
+    'clapping',
+    'car_horn',
+    'keyboard_typing',
+    'hand_saw',
+    'cat',
+    'cow',
+    'frog',
+    'rooster',
+    'insects',
+    'sheep',
+    'coughing',
+    'door_wood_creaks',
+    'crying_baby',
+    'pouring_water',
+    'sneezing',
+    'door_wood_knock',
+    'thunderstorm',
+    'rain',
+    'vacuum_cleaner',
+    'clock_tick',
+    'water_drops',
+    'can_opening',
+    'brushing_teeth',
+    'crackling_fire',
+    'engine',
+    'snoring',
+    'siren',
+    'chirping_birds',
+    'drinking_sipping',
+    'airplane',
+    'hen',
+    'crow',
+    'pig',
+    'footsteps',
+    'clock_alarm',
+    'train',
+    'chainsaw'
+]
+text_list_categories=[
+    'animals',
+    'natural soundscapes/water',
+    'human/non-speech',
+    'interior/domestic',
+    'exterior/urban'
+]
 
 prompt = "The sound of a "
 prompt_use = True
 text_list_esc50_prompt = []
 for i in range(len(text_list_esc50)):
     text_list_esc50_prompt.append(prompt + text_list_esc50[i])
-
-text_list = text_list_esc50
 
 # Define list of audio files in dataset
 audio_list_esc10 = glob.glob('ESC-50-master/audio/ESC-10/*.wav')
@@ -27,21 +83,21 @@ print(str(sorted(audio_list)[0:3]) + "\n")
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-# Instantiate model
+# Initiate model
 model = imagebind_model.imagebind_huge(pretrained=True)
 model.eval()
 model.to(device)
 
 if prompt_use == True:
-    text_list_modality = text_list_esc50_prompt
+    text_list = text_list_esc50_prompt
 else:
-    text_list_modality = text_list
+    text_list = text_list_esc50
 
 # Due to memory limitations, the audio files are processed in batches of 400
 inputs = {}
 for i in range(5):
     inputs[i] = {
-        ModalityType.TEXT: data.load_and_transform_text(text_list_modality, device),
+        ModalityType.TEXT: data.load_and_transform_text(text_list, device),
         ModalityType.AUDIO: data.load_and_transform_audio_data(audio_list[i*400:(i+1)*400], device),
     }
 
@@ -69,11 +125,11 @@ with open(meta_csv_file, newline='') as csvfile:
 # Convert the ground truth to numbers
 ground_truth_numbers = []
 for i in range(len(ground_truth)):
-    if ground_truth[i] in text_list:
-        ground_truth_numbers.append(text_list.index(ground_truth[i]))
+    if ground_truth[i] in text_list_esc50:
+        ground_truth_numbers.append(text_list_esc50.index(ground_truth[i]))
 
-model_output = {}
 # Convert the model output to numbers
+model_output = {}
 for i in range(len(embeddings)):
     # Append model_output to the previous model_output
     model_output[i] = torch.softmax(embeddings[i][ModalityType.AUDIO] @ embeddings[i][ModalityType.TEXT].T, dim=-1)
