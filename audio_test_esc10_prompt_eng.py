@@ -9,14 +9,14 @@ from imagebind.models import imagebind_model
 from imagebind.models.imagebind_model import ModalityType
 import glob
 import csv
-from prompts import text_list_esc10, text_list_esc50, text_list_categories, prompt, esc_10_synonyms_dict
+from prompts import text_list_esc10, text_list_esc50, text_list_categories, pre_prompts, esc_10_synonyms_dict
 
 prompt_use = True
 
-for j in range(len(prompt)):
+for j in range(len(pre_prompts)):
     text_list_esc10_prompt = []
     for i in range(len(text_list_esc10)):
-        text_list_esc10_prompt.append(prompt[j] + text_list_esc10[i])
+        text_list_esc10_prompt.append(pre_prompts[j] + text_list_esc10[i])
 
     text_list = text_list_esc10
 
@@ -80,6 +80,6 @@ for j in range(len(prompt)):
         if model_output_numbers[i] == ground_truth_numbers[i]:
             correct += 1
 
-    print('\nThe prompt prefix appended to the classes was: "{}"'.format(prompt[j]))
+    print('\nThe prompt prefix appended to the classes was: "{}"'.format(pre_prompts[j]))
     print('Correct: {} out of 400.'.format(correct))
     print('Accuracy: {}%'.format(correct/len(model_output_numbers)*100))
