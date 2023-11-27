@@ -6,6 +6,7 @@ from imagebind.models.imagebind_model import ModalityType
 import glob
 import csv
 from prompts import text_list_esc10, esc_10_synonyms
+from tests import evaluate_top_x_accuracy
 
 text_list = esc_10_synonyms
 for i in range(5): print("\n{}\n".format(text_list[i*10]))
@@ -64,36 +65,44 @@ print(torch.argsort(model_output[0])[-5:])
 model_output = model_output.cpu()
 print(torch.argsort(model_output[0])[-5:].numpy(), type(torch.argsort(model_output[0])[-5:].numpy()))
 
-# Top 1 classification accuracy
-model_output_numbers_top_1 = []
-print("The model output has {} elements.".format(len(model_output)))
-for i in range(len(model_output)):
-    model_output_numbers_top_1.append(torch.argmax(model_output[i]))
+# # Top 1 classification accuracy
+# model_output_numbers_top_1 = []
+# print("The model output has {} elements.".format(len(model_output)))
+# for i in range(len(model_output)):
+#     model_output_numbers_top_1.append(torch.argmax(model_output[i]))
 
-# Evaluate the top 1 classification accuracy, evaluating whether the audio is classified with the correct class, where the correct class is defined as a set of 10 synonyms
-# E.g. if the correct class is "dog" (number 1 in the ground truth set), then the top 1 classification is accurate for classifying the audio in the range 10-19
-top_1_correct = 0
-for i in range(len(model_output_numbers_top_1)):
-    if model_output_numbers_top_1[i] in range(ground_truth_numbers[i]*10, ground_truth_numbers[i]*10+10):
-        top_1_correct += 1
+# # Evaluate the top 1 classification accuracy, evaluating whether the audio is classified with the correct class, where the correct class is defined as a set of 10 synonyms
+# # E.g. if the correct class is "dog" (number 1 in the ground truth set), then the top 1 classification is accurate for classifying the audio in the range 10-19
+# top_1_correct = 0
+# for i in range(len(model_output_numbers_top_1)):
+#     if model_output_numbers_top_1[i] in range(ground_truth_numbers[i]*10, ground_truth_numbers[i]*10+10):
+#         top_1_correct += 1
 
+# print('Top 1 correct: ', top_1_correct)
+# print('Accuracy: ', top_1_correct/len(model_output_numbers_top_1)*100, "%")
+
+# # Top 5 classification accuracy
+# model_output_numbers_top_5 = []
+# print("The model output has {} elements.".format(len(model_output)))
+# for i in range(len(model_output)):
+#     model_output_numbers_top_5.append(torch.argsort(model_output[i])[-5:].numpy())
+
+# # Evaluate the top 5 classification accuracy, evaluating whether the audio is classified with the correct class, where the correct class is defined as a set of 10 synonyms
+# # E.g. if the correct class is "dog" (number 1 in the ground truth set), then the top 5 classification is accurate for any of the 5 array elements classifying the audio in the range 10-19
+# top_5_correct = 0
+# for i in range(len(model_output_numbers_top_5)):
+#     for j in range(len(model_output_numbers_top_5[i])):
+#         if model_output_numbers_top_5[i][j] in range(ground_truth_numbers[i]*10, ground_truth_numbers[i]*10+10):
+#             top_5_correct += 1
+#             break
+
+# print('Top 5 correct: ', top_5_correct)
+# print('Accuracy: ', top_5_correct/len(model_output_numbers_top_5)*100, "%")
+
+top_1_correct, top_1_accuracy = evaluate_top_x_accuracy(model_output, ground_truth_numbers, 1)
 print('Top 1 correct: ', top_1_correct)
-print('Accuracy: ', top_1_correct/len(model_output_numbers_top_1)*100, "%")
+print('Top 1 Accuracy: ', top_1_accuracy, "%")
 
-# Top 5 classification accuracy
-model_output_numbers_top_5 = []
-print("The model output has {} elements.".format(len(model_output)))
-for i in range(len(model_output)):
-    model_output_numbers_top_5.append(torch.argsort(model_output[i])[-5:].numpy())
-
-# Evaluate the top 5 classification accuracy, evaluating whether the audio is classified with the correct class, where the correct class is defined as a set of 10 synonyms
-# E.g. if the correct class is "dog" (number 1 in the ground truth set), then the top 5 classification is accurate for any of the 5 array elements classifying the audio in the range 10-19
-top_5_correct = 0
-for i in range(len(model_output_numbers_top_5)):
-    for j in range(len(model_output_numbers_top_5[i])):
-        if model_output_numbers_top_5[i][j] in range(ground_truth_numbers[i]*10, ground_truth_numbers[i]*10+10):
-            top_5_correct += 1
-            break
-
+top_5_correct, top_5_accuracy = evaluate_top_x_accuracy(model_output, ground_truth_numbers, 5)
 print('Top 5 correct: ', top_5_correct)
-print('Accuracy: ', top_5_correct/len(model_output_numbers_top_5)*100, "%")
+print('Top 5 Accuracy: ', top_5_accuracy, "%")
