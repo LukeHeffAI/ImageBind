@@ -4,71 +4,10 @@ from imagebind.models import imagebind_model
 from imagebind.models.imagebind_model import ModalityType
 import glob
 import csv
-
-# Define list of classes contained in audio dataset
-text_list_esc50 = [
-    'mouse_click',
-    'fireworks',
-    'helicopter',
-    'dog',
-    'church_bells',
-    'toilet_flush',
-    'glass_breaking',
-    'category',
-    'sea_waves',
-    'wind',
-    'laughing',
-    'washing_machine',
-    'crickets',
-    'breathing',
-    'clapping',
-    'car_horn',
-    'keyboard_typing',
-    'hand_saw',
-    'cat',
-    'cow',
-    'frog',
-    'rooster',
-    'insects',
-    'sheep',
-    'coughing',
-    'door_wood_creaks',
-    'crying_baby',
-    'pouring_water',
-    'sneezing',
-    'door_wood_knock',
-    'thunderstorm',
-    'rain',
-    'vacuum_cleaner',
-    'clock_tick',
-    'water_drops',
-    'can_opening',
-    'brushing_teeth',
-    'crackling_fire',
-    'engine',
-    'snoring',
-    'siren',
-    'chirping_birds',
-    'drinking_sipping',
-    'airplane',
-    'hen',
-    'crow',
-    'pig',
-    'footsteps',
-    'clock_alarm',
-    'train',
-    'chainsaw'
-]
-text_list_categories=[
-    'animals',
-    'natural soundscapes/water',
-    'human/non-speech',
-    'interior/domestic',
-    'exterior/urban'
-]
+from prompts import text_list_esc50
 
 prompt = "The sound of a "
-prompt_use = False
+prompt_use = True
 text_list_esc50_prompt = []
 for i in range(len(text_list_esc50)):
     text_list_esc50_prompt.append(prompt + text_list_esc50[i])
@@ -79,7 +18,6 @@ audio_list_esc50 = glob.glob('ESC-50-master/audio/ESC-50/*.wav')
 audio_list = audio_list_esc50
 
 audio_list = sorted(audio_list)
-print(str(sorted(audio_list)[0:3]) + "\n")
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -94,6 +32,7 @@ else:
     text_list = text_list_esc50
 
 # Due to memory limitations, the audio files are processed in batches of 400
+# Tokenisation of text happens at this stage
 inputs = {}
 for i in range(5):
     inputs[i] = {

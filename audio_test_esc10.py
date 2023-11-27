@@ -4,10 +4,7 @@ from imagebind.models import imagebind_model
 from imagebind.models.imagebind_model import ModalityType
 import glob
 import csv
-
-# Define list of classes contained in ESC-10 dataset
-text_list_esc10 = ['chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves']
-text_list_categories = ['animals', 'natural soundscapes/water', 'human/non-speech', 'interior/domestic', 'exterior/urban']
+from prompts import text_list_esc10
 
 text_list = text_list_esc10
 print("\n" + str(text_list) + "\n")
@@ -56,6 +53,7 @@ for i in range(len(ground_truth)):
     if ground_truth[i] in text_list:
         ground_truth_numbers.append(text_list.index(ground_truth[i]))
 
+# Correct answer: [1, 1, 0, 7, 8, 8, 8, 8, 8, 8]
 print("Ground truth numbers: {}".format(ground_truth_numbers[0:10]))
 
 model_output = {}
