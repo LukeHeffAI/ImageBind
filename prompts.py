@@ -224,7 +224,7 @@ esc_10_synonyms_dict={
     ]
 }
 
-test=[
+esc_10_synonyms=[
     'A loud, aggressive buzzing noise that fluctuates in intensity as it cuts through wood',
     'A roaring mechanical growl that rises and falls, echoing the rhythm of slicing through timber',
     'An intense, metallic snarl that ebbs and surges, mirroring the cadence of chopping lumber',
