@@ -81,9 +81,13 @@ text_list_categories = [
 
 # Define list of prompts to pre-append/append to the class names
 pre_prompts = [
-    "'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves'",
+    "'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', 'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves', ",
+    "'chainsaw', 'dog', 'rooster', 'rain', 'sneezing', 'crying_baby', 'clock_tick', 'crackling_fire', 'helicopter', 'sea_waves'",
+    "chainsaw, dog, rooster, rain, sneezing, crying_baby, clock_tick, crackling_fire, helicopter, sea_waves",
     "ddhdgjddrtysesrrtj",
     "ddhdgjddrtysesrrtj ",
+    "ddhdgjddrtysesrrtj ddhdgjddrtysesrrtj ",
+    "ddhdgjddrtysesrrtj ddhdgjddrtysesrrtj ddhdgjddrtysesrrtj ",
     "Dog. Sneezing. Crying. Rain. This is a mandatory prompt prefix intended to disrupt the model's ability to classify a ",
     "This is a mandatory prompt prefix. ",
     "This is a mandatory prompt prefix intended to disrupt the model's ability to classify a ",
