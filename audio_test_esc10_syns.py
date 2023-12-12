@@ -9,7 +9,6 @@ from prompts import text_list_esc10, esc_10_synonyms
 from tests import evaluate_top_x_accuracy
 
 text_list = esc_10_synonyms
-for i in range(5): print("\n{}\n".format(text_list[i*10]))
 
 # Define list of audio files in ESC-10 dataset
 audio_list_esc10 = glob.glob('ESC-50-master/audio/ESC-10/*.wav')
@@ -55,54 +54,38 @@ for i in range(len(ground_truth)):
         ground_truth_numbers.append(text_list_esc10.index(ground_truth[i]))
 
 # Correct answer: [1, 1, 0, 7, 8, 8, 8, 8, 8, 8]
-print("Ground truth numbers: {}".format(ground_truth_numbers[0:10]))
+print("\nGround truth numbers: {}, Correct: [1, 1, 0, 7, 8, 8, 8, 8, 8, 8]\n".format(ground_truth_numbers[0:10]))
 
 model_output = {}
 # Convert the model output to numbers
+# 400 audio samples, 100 text samples (10 per class, 10 classes)
 model_output = torch.softmax(embeddings[ModalityType.AUDIO] @ embeddings[ModalityType.TEXT].T, dim=-1)
 
-print(torch.argsort(model_output[0])[-5:])
-model_output = model_output.cpu()
-print(torch.argsort(model_output[0])[-5:].numpy(), type(torch.argsort(model_output[0])[-5:].numpy()))
+class_predictions = torch.zeros(model_output.shape[0], model_output.shape[1] // 10)
 
-# # Top 1 classification accuracy
-# model_output_numbers_top_1 = []
-# print("The model output has {} elements.".format(len(model_output)))
-# for i in range(len(model_output)):
-#     model_output_numbers_top_1.append(torch.argmax(model_output[i]))
+for i in range(model_output.shape[0]): # 400
 
-# # Evaluate the top 1 classification accuracy, evaluating whether the audio is classified with the correct class, where the correct class is defined as a set of 10 synonyms
-# # E.g. if the correct class is "dog" (number 1 in the ground truth set), then the top 1 classification is accurate for classifying the audio in the range 10-19
-# top_1_correct = 0
-# for i in range(len(model_output_numbers_top_1)):
-#     if model_output_numbers_top_1[i] in range(ground_truth_numbers[i]*10, ground_truth_numbers[i]*10+10):
-#         top_1_correct += 1
+    for j in range(0, model_output.shape[1], 10): # 10
+        class_predictions[i][j // 10] = model_output[i, j:j + 10].sum()
 
-# print('Top 1 correct: ', top_1_correct)
-# print('Accuracy: ', top_1_correct/len(model_output_numbers_top_1)*100, "%")
+print(class_predictions[0:10])
+print(class_predictions.T[0:10])
 
-# # Top 5 classification accuracy
-# model_output_numbers_top_5 = []
-# print("The model output has {} elements.".format(len(model_output)))
-# for i in range(len(model_output)):
-#     model_output_numbers_top_5.append(torch.argsort(model_output[i])[-5:].numpy())
+correct_class_predictions = 0
+for i in range(class_predictions.shape[0]):
+    if torch.argmax(class_predictions[i]) == ground_truth_numbers[i]:
+        correct_class_predictions += 1
 
-# # Evaluate the top 5 classification accuracy, evaluating whether the audio is classified with the correct class, where the correct class is defined as a set of 10 synonyms
-# # E.g. if the correct class is "dog" (number 1 in the ground truth set), then the top 5 classification is accurate for any of the 5 array elements classifying the audio in the range 10-19
-# top_5_correct = 0
-# for i in range(len(model_output_numbers_top_5)):
-#     for j in range(len(model_output_numbers_top_5[i])):
-#         if model_output_numbers_top_5[i][j] in range(ground_truth_numbers[i]*10, ground_truth_numbers[i]*10+10):
-#             top_5_correct += 1
-#             break
+print("Correct class predictions: {}".format(correct_class_predictions))
 
-# print('Top 5 correct: ', top_5_correct)
-# print('Accuracy: ', top_5_correct/len(model_output_numbers_top_5)*100, "%")
+top_1_correct,  top_1_total_correct, top_1_accuracy = evaluate_top_x_accuracy(model_output, ground_truth_numbers, 1)
+print('Top 1 correct instances:         ', top_1_correct)
+# print('Total Top 1 summed correct predictions: ', top_1_summed_correct)
+print('Total Top 1 correct predictions: ', top_1_total_correct)
+print('Top 1 Accuracy:                  ', top_1_accuracy, "%\n")
 
-top_1_correct, top_1_accuracy = evaluate_top_x_accuracy(model_output, ground_truth_numbers, 1)
-print('Top 1 correct: ', top_1_correct)
-print('Top 1 Accuracy: ', top_1_accuracy, "%")
-
-top_5_correct, top_5_accuracy = evaluate_top_x_accuracy(model_output, ground_truth_numbers, 5)
-print('Top 5 correct: ', top_5_correct)
-print('Top 5 Accuracy: ', top_5_accuracy, "%")
+top_5_correct,  top_5_total_correct, top_5_accuracy = evaluate_top_x_accuracy(model_output, ground_truth_numbers, 5)
+print('Top 5 correct instances:         ', top_5_correct)
+# print('Total Top 5 summed correct predictions: ', top_5_summed_correct)
+print('Total Top 5 correct predictions: ', top_5_total_correct)
+print('Top 5 Accuracy:                  ', top_5_accuracy, "%")
