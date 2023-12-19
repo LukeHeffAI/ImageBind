@@ -4,6 +4,7 @@ import numpy as np
 def evaluate_top_x_accuracy(model_output, ground_truth_numbers, x):
     top_x_correct = 0
     total_correct_predictions = 0
+    correct_prediction_indexes = []
 
     for i in range(len(model_output)):
         # Extract top x predictions
@@ -11,7 +12,10 @@ def evaluate_top_x_accuracy(model_output, ground_truth_numbers, x):
         
         # Check how many of the top x predictions are correct
         correct_predictions = sum(pred in range(ground_truth_numbers[i]*10, ground_truth_numbers[i]*10+10) for pred in top_x_predictions)
-        
+        # Append the index of the correct prediction
+        if correct_predictions > 0:
+            correct_prediction_indexes.append(i)
+
         # If at least one correct, count this instance as correct
         if correct_predictions > 0:
             top_x_correct += 1
@@ -32,4 +36,4 @@ def evaluate_top_x_accuracy(model_output, ground_truth_numbers, x):
 
     accuracy = top_x_correct / len(model_output) * 100
 
-    return top_x_correct, total_correct_predictions, accuracy
+    return top_x_correct, total_correct_predictions, accuracy, correct_prediction_indexes
