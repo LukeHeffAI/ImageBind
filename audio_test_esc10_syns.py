@@ -104,7 +104,7 @@ print('Top 1 correct instances:         ', top_1_correct)
 # print('Total Top 1 summed correct predictions: ', top_1_summed_correct)
 print('Total Top 1 correct predictions: ', top_1_total_correct)
 print('Top 1 Accuracy:                  ', top_1_accuracy, "%\n")
-print('Top 1 indices:         ', top_1_indices)
+# print('Top 1 indices:         ', top_1_indices)
 
 top_5_correct,  top_5_total_correct, top_5_accuracy, top_5_indices = evaluate_top_x_accuracy(model_output, ground_truth_numbers, 5)
 print('Top 5 correct instances:         ', top_5_correct)
@@ -116,10 +116,19 @@ print('Top 1 correct instances:         ', top_1_correct_esc_10)
 # print('Total Top 1 summed correct predictions: ', top_1_summed_correct)
 # print('Total Top 1 correct predictions: ', top_1_total_correct_esc_10)
 print('Top 1 Accuracy:                  ', top_1_correct_esc_10/len(model_output_numbers_esc_10), "%\n")
-print(base_correct_esc_10)
 
-for i in range(max(len(top_1_indices), len(base_correct_esc_10))):
-    if top_1_indices[i] in base_correct_esc_10:
-        print("Mismatch of classification methods at: ", i)
-    # elif base_correct_esc_10[i] in top_1_indices:
-    #     print("Mismatch of classification methods at: ", i)
+## Test the differences in accuracy between the ESC-10 class label classification and ESC-10 synonym classifcation
+mismatch_class = []
+for i in range(len(top_1_indices)):
+    if top_1_indices[i] not in base_correct_esc_10:
+        mismatch_class.append(i)
+
+mismatch_syns = []
+for i in range(len(base_correct_esc_10)):
+    if base_correct_esc_10[i] not in top_1_indices:
+        mismatch_syns.append(i)
+
+mismatch_class.sort()
+mismatch_syns.sort()
+print(len(mismatch_class), mismatch_class)
+print(len(mismatch_syns), mismatch_syns)
