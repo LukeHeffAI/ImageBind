@@ -2,17 +2,13 @@
 ## The data used will be a random split of the ESC-50 dataset
 
 import torch
-import torch.nn as nn
-import librosa
-import numpy as np
-from functools import partial
 from imagebind import data
-from imagebind.models import imagebind_model
-from imagebind.models.imagebind_model import ModalityType, ImageBindModel
-from imagebind.models.multimodal_preprocessors import AudioPreprocessor, SpatioTemporalPosEmbeddingHelper, PatchEmbedGeneric
 import glob
 import csv
 from prompts import text_list_esc10, text_list_esc50, esc_10_synonyms
+from imagebind import ModalityType
+import librosa
+import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, cross_val_score
