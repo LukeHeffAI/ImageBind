@@ -46,6 +46,49 @@ for i in range(len(class_labels)):
 audio_list = glob.glob('ESC-50-master/audio/ESC-50/*.wav')
 audio_list = sorted(audio_list)
 
+audio_embed_dim=768
+audio_kernel_size=16
+audio_stride=10
+audio_num_mel_bins=128
+audio_target_len=204
+
+# Define the audio stem
+audio_stem = PatchEmbedGeneric(
+            proj_stem=[
+                nn.Conv2d(
+                    in_channels=1,
+                    kernel_size=audio_kernel_size,
+                    stride=audio_stride,
+                    out_channels=audio_embed_dim,
+                    bias=False,
+                ),
+            ],
+            norm_layer=nn.LayerNorm(normalized_shape=audio_embed_dim),
+        )
+
+# Initialise the audio-preprocessor 
+audio_preprocessor = AudioPreprocessor(
+    img_size=[1, audio_num_mel_bins, audio_target_len],
+    num_cls_tokens=1,
+    pos_embed_fn=partial(SpatioTemporalPosEmbeddingHelper, learnable=True),
+    audio_stem=audio_stem,
+)
+
+def process_audio_file(file_path, audio_preprocessor, device):
+    # Load the audio file as a waveform
+    waveform, sr = librosa.load(file_path, sr=None)  # sr=None ensures original sample rate is used
+
+    # Convert to Mel-spectrogram
+    spectrogram = librosa.feature.melspectrogram(waveform, sr=sr)
+    spectrogram = librosa.power_to_db(spectrogram)
+    spectrogram = torch.tensor(spectrogram).unsqueeze(0)  # Add batch dimension
+
+    # Process with AudioPreprocessor
+    processed_data = audio_preprocessor(spectrogram.to(device))
+    
+    # TODO: Reshape or adjust the processed data as needed
+    # TODO: Assuming we flatten the output for KNN
+    return processed_data.view(-1).cpu().numpy()
 
 # For classifying using number labels
 # Split into training (70%), validation (15%), and testing (15%) data
@@ -57,10 +100,23 @@ audio_val, audio_test, class_numbers_val, class_numbers_test = train_test_split(
 audio_train, audio_test, class_text_train, class_text_test = train_test_split(audio_list, class_labels, test_size=0.3, random_state=42)
 audio_val, audio_test, class_text_val, class_text_test = train_test_split(audio_test, class_text_test, test_size=0.5, random_state=42)
 
+# Process all audio files
+audio_features_train = [process_audio_file(file, audio_preprocessor, device) for file in audio_train]
+audio_features_test = [process_audio_file(file, audio_preprocessor, device) for file in audio_test]
+
+# Flatten or reshape the tensors as needed to fit into KNN
+# Example: 
+audio_features_train = [feature.view(-1).cpu().numpy() for feature in audio_features_train]
+audio_features_test = [feature.view(-1).cpu().numpy() for feature in audio_features_test]
+
+# Convert to numpy arrays
+audio_features_train = np.array(audio_features_train)
+audio_features_test = np.array(audio_features_test)
+
 # Now you can use these features in your KNN classifier
 knn_model = KNeighborsClassifier(n_neighbors=5)
-knn_model.fit(audio_train, class_numbers_train)
-class_numbers_pred = knn_model.predict(audio_test)
+knn_model.fit(audio_features_train, class_numbers_train)
+class_numbers_pred = knn_model.predict(audio_features_test)
 accuracy = accuracy_score(class_numbers_test, class_numbers_pred)
 
 # For classifying using number labels
